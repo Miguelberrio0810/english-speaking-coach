@@ -112,7 +112,6 @@ export function ListeningActivity({ activity, apiKey, onApiKey, onBack, onComple
   }
 
   const wordCount    = transcript.split(/\s+/).filter(Boolean).length;
-  const targetWords  = activity.text.split(/\s+/).filter(Boolean).length;
   const hasFeedback  = streamingText.length > 0;
 
   return (
