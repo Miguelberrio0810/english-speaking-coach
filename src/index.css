@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0B0B11;
+  --color-surface:    #17172A;
+  --color-surface-2:  #1F1F38;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Skill accent colors */
+  --color-speaking: #8B5CF6;
+  --color-listening: #F59E0B;
+  --color-reading:  #0EA5E9;
+  --color-writing:  #10B981;
+}
+
+@layer base {
+  html, body { margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+  body { background-color: #0B0B11; color: #f1f5f9; min-height: 100vh; }
+  #root { min-height: 100vh; }
+  * { box-sizing: border-box; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #0B0B11; }
+  ::-webkit-scrollbar-thumb { background: #2a2a4a; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #8B5CF655; }
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+
+@keyframes pulseRing {
+  0%   { transform: scale(1);   opacity: 0.85; }
+  50%  { transform: scale(1.2); opacity: 0.2;  }
+  100% { transform: scale(1);   opacity: 0.85; }
+}
+.pulse-ring { animation: pulseRing 1.2s ease-in-out infinite; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.fade-in { animation: fadeIn 0.3s ease forwards; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.slide-up { animation: slideUp 0.4s ease forwards; }
+
+/* ── AI feedback markdown ───────────────────────────────────────────────── */
+
+.feedback-prose {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.75;
+}
+
+.feedback-prose h1,
+.feedback-prose h2,
+.feedback-prose h3 {
+  font-weight: 700;
+  margin: 1.1rem 0 0.45rem;
+  line-height: 1.35;
+}
+
+.feedback-prose h1 { font-size: 1.1rem;  color: #a78bfa; }
+.feedback-prose h2 { font-size: 1.0rem;  color: #a78bfa; }
+.feedback-prose h3 { font-size: 0.92rem; color: #c4b5fd; }
+
+.feedback-prose p {
+  margin: 0.55rem 0;
+  color: #cbd5e1;
+  line-height: 1.8;
+}
+
+.feedback-prose ul,
+.feedback-prose ol {
+  padding-left: 1.4rem;
+  margin: 0.45rem 0;
+}
+
+.feedback-prose li {
+  color: #cbd5e1;
+  margin: 0.25rem 0;
+  line-height: 1.7;
+}
+
+.feedback-prose strong { color: #e2e8f0; font-weight: 600; }
+.feedback-prose em    { color: #a78bfa; font-style: italic; }
+
+.feedback-prose code {
+  background: #1F1F38;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.83rem;
+  color: #60a5fa;
+}
+
+.feedback-prose blockquote {
+  border-left: 3px solid #8B5CF6;
+  padding-left: 1rem;
+  margin: 0.8rem 0;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.feedback-prose hr {
+  border-color: #2a2a3e;
+  margin: 1.1rem 0;
+}
+
+/* Skill-specific heading colors */
+.feedback-prose--listening h1,
+.feedback-prose--listening h2,
+.feedback-prose--listening h3 { color: #F59E0B; }
+.feedback-prose--listening blockquote { border-color: #F59E0B; }
+
+.feedback-prose--reading h1,
+.feedback-prose--reading h2,
+.feedback-prose--reading h3 { color: #0EA5E9; }
+.feedback-prose--reading blockquote { border-color: #0EA5E9; }
+
+.feedback-prose--writing h1,
+.feedback-prose--writing h2,
+.feedback-prose--writing h3 { color: #10B981; }
+.feedback-prose--writing blockquote { border-color: #10B981; }
