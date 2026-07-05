@@ -7,18 +7,15 @@ import remarkGfm from 'remark-gfm';
 
 interface Props {
   activity:   Activity;
-  apiKey:     string;
-  onApiKey:   (key: string) => void;
   onBack:     () => void;
   onComplete: (entry: SessionEntry) => void;
 }
 
-export function ReadingActivity({ activity, apiKey, onApiKey, onBack, onComplete }: Props) {
+export function ReadingActivity({ activity, onBack, onComplete }: Props) {
   const [step, setStep]         = useState<'read' | 'questions' | 'feedback'>('read');
   const [answers, setAnswers]   = useState<string[]>(
     () => (activity.questions ?? []).map(() => '')
   );
-  const [showKey, setShowKey]   = useState(false);
   const [elapsed, setElapsed]   = useState(0);
   const [startTime]             = useState(Date.now());
   const [hasAsked, setHasAsked] = useState(false);
@@ -43,12 +40,6 @@ export function ReadingActivity({ activity, apiKey, onApiKey, onBack, onComplete
 
   const wordCount = activity.text.split(/\s+/).filter(Boolean).length;
 
-  function handleSaveKey(key: string) {
-    onApiKey(key);
-    if (key) localStorage.setItem('claude_api_key', key);
-    else localStorage.removeItem('claude_api_key');
-  }
-
   async function handleSubmit() {
     const joined = (activity.questions ?? [])
       .map((q, i) => `${i + 1}. ${q}\nAnswer: ${answers[i] || '(no answer)'}`)
@@ -63,7 +54,6 @@ export function ReadingActivity({ activity, apiKey, onApiKey, onBack, onComplete
     const duration = Math.round((Date.now() - startTime) / 1000);
 
     await getFeedback({
-      apiKey,
       skill:       'reading',
       level:       activity.level,
       topicLabel:  activity.title,
@@ -205,34 +195,6 @@ export function ReadingActivity({ activity, apiKey, onApiKey, onBack, onComplete
       {/* ── STEP: feedback ── */}
       {step === 'feedback' && (
         <div className="fade-in flex flex-col gap-5">
-
-          {/* API Key */}
-          <div className="bg-surface rounded-2xl border border-white/10 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-sky-400">🔑</span>
-              <h3 className="text-sm font-semibold text-slate-200">Claude API Key</h3>
-              <a href="https://console.anthropic.com/keys" target="_blank" rel="noopener noreferrer"
-                 className="ml-auto text-xs text-sky-400 hover:text-sky-300 underline underline-offset-2">
-                Get a key →
-              </a>
-            </div>
-            <div className="relative">
-              <input
-                type={showKey ? 'text' : 'password'}
-                value={apiKey}
-                onChange={e => handleSaveKey(e.target.value)}
-                placeholder="sk-ant-…"
-                className="w-full bg-background border border-white/10 rounded-xl px-4 py-2.5 pr-10
-                           text-sm text-slate-200 placeholder-slate-600
-                           focus:outline-none focus:border-sky-500/60 focus:ring-1 focus:ring-sky-500/30
-                           transition-colors"
-              />
-              <button onClick={() => setShowKey(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
-                {showKey ? '🙈' : '👁️'}
-              </button>
-            </div>
-          </div>
 
           {error && (
             <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4">

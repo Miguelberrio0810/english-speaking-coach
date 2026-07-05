@@ -9,7 +9,9 @@ import { ListeningActivity } from './components/ListeningActivity';
 import { ReadingActivity }   from './components/ReadingActivity';
 import { WritingActivity }   from './components/WritingActivity';
 import { SessionHistory, type SessionEntry } from './components/SessionHistory';
+import { PlacementQuiz }    from './components/PlacementQuiz';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
+import { loadProfile, saveProfile, type UserProfile } from './lib/profile';
 
 // ── Storage ───────────────────────────────────────────────────────────────
 
@@ -33,13 +35,13 @@ type ResultTab    = 'Accuracy' | 'AI Feedback';
 
 // ── App ───────────────────────────────────────────────────────────────────
 
-type View = 'home' | 'speaking' | 'listening' | 'reading' | 'writing';
+type View = 'home' | 'placement' | 'speaking' | 'listening' | 'reading' | 'writing';
 
 export default function App() {
-  const [view,     setView]     = useState<View>('home');
+  const [view,     setView]     = useState<View>(() => (loadProfile() ? 'home' : 'placement'));
   const [activity, setActivity] = useState<Activity | null>(null);
   const [history,  setHistory]  = useState<SessionEntry[]>(loadHistory);
-  const [apiKey,   setApiKey]   = useState(() => localStorage.getItem('claude_api_key') || '');
+  const [profile,  setProfile]  = useState<UserProfile | null>(loadProfile);
 
   // Speaking sub-state
   const [speakingStep, setSpeakingStep] = useState<SpeakingStep>('read');
@@ -64,6 +66,22 @@ export default function App() {
   function clearHistory() {
     setHistory([]);
     localStorage.removeItem(HISTORY_KEY);
+  }
+
+  // ── Profile / placement quiz ──
+
+  function handleProfileUpdate(next: UserProfile) {
+    setProfile(next);
+    saveProfile(next);
+  }
+
+  function handleQuizComplete(next: UserProfile) {
+    handleProfileUpdate(next);
+    setView('home');
+  }
+
+  function handleQuizSkip() {
+    setView('home');
   }
 
   // ── Navigation ──
@@ -129,10 +147,21 @@ export default function App() {
     <div className="min-h-screen bg-background text-slate-100">
       <div className="max-w-2xl mx-auto px-4 py-8">
 
+        {/* ── PLACEMENT QUIZ ── */}
+        {view === 'placement' && (
+          <PlacementQuiz onComplete={handleQuizComplete} onSkip={handleQuizSkip} />
+        )}
+
         {/* ── HOME ── */}
         {view === 'home' && (
           <>
-            <HomeScreen onStart={handleActivityStart} />
+            <HomeScreen
+              onStart={handleActivityStart}
+              profile={profile}
+              history={history}
+              onProfileUpdate={handleProfileUpdate}
+              onRetakeQuiz={() => setView('placement')}
+            />
             <div className="mt-10">
               <SessionHistory sessions={history} onClear={clearHistory} />
             </div>
@@ -258,8 +287,6 @@ export default function App() {
                     practiceText={practiceText}
                     spokenText={speech.transcript}
                     accuracy={accuracy}
-                    apiKey={apiKey}
-                    onApiKey={setApiKey}
                   />
                 )}
 
@@ -280,8 +307,6 @@ export default function App() {
         {view === 'listening' && activity && (
           <ListeningActivity
             activity={activity}
-            apiKey={apiKey}
-            onApiKey={setApiKey}
             onBack={goHome}
             onComplete={addEntry}
           />
@@ -291,8 +316,6 @@ export default function App() {
         {view === 'reading' && activity && (
           <ReadingActivity
             activity={activity}
-            apiKey={apiKey}
-            onApiKey={setApiKey}
             onBack={goHome}
             onComplete={addEntry}
           />
@@ -302,8 +325,6 @@ export default function App() {
         {view === 'writing' && activity && (
           <WritingActivity
             activity={activity}
-            apiKey={apiKey}
-            onApiKey={setApiKey}
             onBack={goHome}
             onComplete={addEntry}
           />

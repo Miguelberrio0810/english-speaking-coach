@@ -7,16 +7,13 @@ import remarkGfm from 'remark-gfm';
 
 interface Props {
   activity:   Activity;
-  apiKey:     string;
-  onApiKey:   (key: string) => void;
   onBack:     () => void;
   onComplete: (entry: SessionEntry) => void;
 }
 
-export function WritingActivity({ activity, apiKey, onApiKey, onBack, onComplete }: Props) {
+export function WritingActivity({ activity, onBack, onComplete }: Props) {
   const [writtenText, setWrittenText] = useState('');
   const [step, setStep]               = useState<'write' | 'feedback'>('write');
-  const [showKey, setShowKey]         = useState(false);
   const [hasAsked, setHasAsked]       = useState(false);
   const [startTime]                   = useState(Date.now());
 
@@ -29,12 +26,6 @@ export function WritingActivity({ activity, apiKey, onApiKey, onBack, onComplete
   const tooShort   = wordCount > 0 && wordCount < min;
   const tooLong    = wordCount > max;
 
-  function handleSaveKey(key: string) {
-    onApiKey(key);
-    if (key) localStorage.setItem('claude_api_key', key);
-    else localStorage.removeItem('claude_api_key');
-  }
-
   async function handleSubmit() {
     if (!writtenText.trim()) return;
 
@@ -45,7 +36,6 @@ export function WritingActivity({ activity, apiKey, onApiKey, onBack, onComplete
     const duration = Math.round((Date.now() - startTime) / 1000);
 
     await getFeedback({
-      apiKey,
       skill:          'writing',
       level:          activity.level,
       topicLabel:     activity.title,
@@ -169,34 +159,6 @@ export function WritingActivity({ activity, apiKey, onApiKey, onBack, onComplete
             </div>
           </div>
 
-          {/* API Key (shown before submit) */}
-          <div className="bg-surface rounded-2xl border border-white/10 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-emerald-400">🔑</span>
-              <h3 className="text-sm font-semibold text-slate-200">Claude API Key</h3>
-              <a href="https://console.anthropic.com/keys" target="_blank" rel="noopener noreferrer"
-                 className="ml-auto text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2">
-                Get a key →
-              </a>
-            </div>
-            <div className="relative">
-              <input
-                type={showKey ? 'text' : 'password'}
-                value={apiKey}
-                onChange={e => handleSaveKey(e.target.value)}
-                placeholder="sk-ant-…"
-                className="w-full bg-background border border-white/10 rounded-xl px-4 py-2.5 pr-10
-                           text-sm text-slate-200 placeholder-slate-600
-                           focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30
-                           transition-colors"
-              />
-              <button onClick={() => setShowKey(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
-                {showKey ? '🙈' : '👁️'}
-              </button>
-            </div>
-          </div>
-
           <button
             onClick={handleSubmit}
             disabled={!writtenText.trim()}
@@ -229,34 +191,6 @@ export function WritingActivity({ activity, apiKey, onApiKey, onBack, onComplete
             </summary>
             <p className="text-slate-300 text-sm leading-relaxed mt-3 whitespace-pre-wrap">{writtenText}</p>
           </details>
-
-          {/* API Key (may need to be entered) */}
-          <div className="bg-surface rounded-2xl border border-white/10 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-emerald-400">🔑</span>
-              <h3 className="text-sm font-semibold text-slate-200">Claude API Key</h3>
-              <a href="https://console.anthropic.com/keys" target="_blank" rel="noopener noreferrer"
-                 className="ml-auto text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2">
-                Get a key →
-              </a>
-            </div>
-            <div className="relative">
-              <input
-                type={showKey ? 'text' : 'password'}
-                value={apiKey}
-                onChange={e => handleSaveKey(e.target.value)}
-                placeholder="sk-ant-…"
-                className="w-full bg-background border border-white/10 rounded-xl px-4 py-2.5 pr-10
-                           text-sm text-slate-200 placeholder-slate-600
-                           focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30
-                           transition-colors"
-              />
-              <button onClick={() => setShowKey(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
-                {showKey ? '🙈' : '👁️'}
-              </button>
-            </div>
-          </div>
 
           {error && (
             <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4">

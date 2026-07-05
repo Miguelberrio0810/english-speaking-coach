@@ -1,3 +1,23 @@
+# English Speaking Coach
+
+## Backend setup (required for AI feedback)
+
+AI feedback is served by two Vercel serverless functions under `api/` (`api/feedback.ts` for
+per-activity streaming feedback, `api/placement.ts` for the placement quiz). Both need an
+Anthropic API key set server-side — the app never asks the user for one.
+
+1. Get a key at https://console.anthropic.com/keys if you don't have one.
+2. **Local dev**: create `.env.local` in the project root with:
+   ```
+   ANTHROPIC_API_KEY=sk-ant-...
+   ```
+   Then run `vercel dev` instead of `vite dev` (the plain Vite dev server does not execute `/api`
+   functions). Install the CLI once with `npm i -g vercel` if needed.
+3. **Production (Vercel)**: in the project's Vercel dashboard, go to Settings → Environment
+   Variables and add `ANTHROPIC_API_KEY` there, then redeploy.
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

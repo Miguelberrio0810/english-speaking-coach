@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { type Skill, type CEFRLevel, type Activity, getActivities, CEFR_LEVELS } from '../data/activities';
+import { type UserProfile } from '../lib/profile';
+import { type SessionEntry } from './SessionHistory';
+import { RecommendationsPanel } from './RecommendationsPanel';
 
 interface Props {
-  onStart: (activity: Activity) => void;
+  onStart:         (activity: Activity) => void;
+  profile:         UserProfile | null;
+  history:         SessionEntry[];
+  onProfileUpdate: (profile: UserProfile) => void;
+  onRetakeQuiz:    () => void;
 }
 
 interface SkillMeta {
@@ -67,7 +74,7 @@ const CEFR_BADGE: Record<CEFRLevel, string> = {
   C1: 'bg-rose-500/15     text-rose-400    border-rose-500/30',
 };
 
-export function HomeScreen({ onStart }: Props) {
+export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetakeQuiz }: Props) {
   const [selectedSkill,    setSelectedSkill]    = useState<Skill | null>(null);
   const [selectedLevel,    setSelectedLevel]    = useState<CEFRLevel | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
@@ -79,7 +86,7 @@ export function HomeScreen({ onStart }: Props) {
 
   function handleSkillClick(skill: Skill) {
     setSelectedSkill(skill);
-    setSelectedLevel(null);
+    setSelectedLevel(profile?.skillLevels[skill] ?? null);
     setSelectedActivity(null);
   }
 
@@ -112,6 +119,13 @@ export function HomeScreen({ onStart }: Props) {
           Four skills. Five CEFR levels. Real AI feedback.
         </p>
       </div>
+
+      <RecommendationsPanel
+        profile={profile}
+        history={history}
+        onProfileUpdate={onProfileUpdate}
+        onRetakeQuiz={onRetakeQuiz}
+      />
 
       {/* ── Skill cards ── */}
       <div>

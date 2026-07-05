@@ -11,7 +11,6 @@ export interface UseClaudeAPIReturn {
 }
 
 export interface GetFeedbackParams {
-  apiKey:       string;
   skill:        Skill;
   level:        string;
   topicLabel:   string;
@@ -220,11 +219,6 @@ export function useClaudeAPI(): UseClaudeAPIReturn {
   }, [cancel]);
 
   const getFeedback = useCallback(async (params: GetFeedbackParams) => {
-    if (!params.apiKey.trim()) {
-      setError('Please enter your Claude API key to get AI feedback.');
-      return;
-    }
-
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
@@ -233,19 +227,14 @@ export function useClaudeAPI(): UseClaudeAPIReturn {
     setIsStreaming(true);
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/feedback', {
         method: 'POST',
         signal: controller.signal,
         headers: {
-          'Content-Type':                              'application/json',
-          'x-api-key':                                 params.apiKey,
-          'anthropic-version':                         '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model:      'claude-sonnet-4-6',
           max_tokens: 1800,
-          stream:     true,
           system:     SYSTEM_PROMPTS[params.skill],
           messages: [
             { role: 'user', content: buildPrompt(params) },
