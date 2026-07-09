@@ -13,6 +13,16 @@
   --color-listening: #F59E0B;
   --color-reading:  #0EA5E9;
   --color-writing:  #10B981;
+
+  /* shadcn/ui-style tokens, mapped to this app's dark palette
+     (used by components copied from shadcn/21st.dev registries) */
+  --color-foreground:           #f1f5f9;
+  --color-card:                 #17172A;
+  --color-card-foreground:      #f1f5f9;
+  --color-border:                #2a2a3e;
+  --color-secondary:            #1F1F38;
+  --color-secondary-foreground: #f1f5f9;
+  --color-muted-foreground:     #94a3b8;
 }
 
 @layer base {

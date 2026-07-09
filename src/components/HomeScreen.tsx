@@ -3,6 +3,7 @@ import { type Skill, type CEFRLevel, type Activity, getActivities, CEFR_LEVELS }
 import { type UserProfile } from '../lib/profile';
 import { type SessionEntry } from './SessionHistory';
 import { RecommendationsPanel } from './RecommendationsPanel';
+import AnimatedCardStack from '@/components/ui/animate-card-animation';
 
 interface Props {
   onStart:         (activity: Activity) => void;
@@ -119,6 +120,9 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
           Four skills. Five CEFR levels. Real AI feedback.
         </p>
       </div>
+
+      {/* ── Skill showcase carousel ── */}
+      <AnimatedCardStack onSelectSkill={handleSkillClick} />
 
       <RecommendationsPanel
         profile={profile}
