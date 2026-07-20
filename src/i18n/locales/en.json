@@ -1,0 +1,129 @@
+{
+  "common": {
+    "tryAgain": "Try again",
+    "back": "Back",
+    "stop": "Stop",
+    "all": "All",
+    "loading": "Loading…"
+  },
+  "app": {
+    "title": "English Speaking Coach",
+    "description": "Practice English speaking with AI-powered feedback. Choose a topic, record yourself, and get word-by-word accuracy analysis."
+  },
+  "skills": {
+    "speaking": { "label": "Speaking", "desc": "Read text aloud and get pronunciation feedback" },
+    "listening": { "label": "Listening", "desc": "Listen and type what you hear — dictation challenge" },
+    "reading": { "label": "Reading", "desc": "Read a passage and answer comprehension questions" },
+    "writing": { "label": "Writing", "desc": "Respond to a prompt and get grammar & CEFR feedback" }
+  },
+  "levels": {
+    "A1": { "label": "A1 — Beginner", "desc": "Simple words and phrases, present tense, basic vocabulary" },
+    "A2": { "label": "A2 — Elementary", "desc": "Short sentences, past tense, everyday topics" },
+    "B1": { "label": "B1 — Intermediate", "desc": "Connected sentences, opinions, complex ideas" },
+    "B2": { "label": "B2 — Upper-Int.", "desc": "Abstract topics, sophisticated vocabulary, debate" },
+    "C1": { "label": "C1 — Advanced", "desc": "Academic/professional, nuanced language, complex argument" }
+  },
+  "home": {
+    "tagline": "Four skills. Five CEFR levels. Real AI feedback.",
+    "chooseSkill": "Choose a Skill",
+    "chooseLevel": "Choose Your Level",
+    "chooseActivity": "Choose an Activity",
+    "generateTopic": "✨ Generate a new topic",
+    "generatingTopic": "Generating a new topic…",
+    "generateTopicError": "Couldn't generate a new topic. Try again.",
+    "startActivity": "{{icon}} Start {{skill}} — {{title}}"
+  },
+  "streak": {
+    "days_one": "{{count}} day streak",
+    "days_other": "{{count}} day streak",
+    "noStreak": "Practice today to start a streak"
+  },
+  "progress": {
+    "title": "Your Progress",
+    "summary": "Your accuracy went from {{from}}% to {{to}}% over your last {{count}} sessions.",
+    "notEnoughData": "Complete a few more speaking or listening sessions to see your progress trend."
+  },
+  "placement": {
+    "title": "Level Check",
+    "subtitle": "A quick 5-minute check across all four skills so we can personalize your practice.",
+    "introBody": "You'll answer 15 quick multiple-choice questions, write a few sentences, and read a short passage aloud. We'll estimate your CEFR level per skill and suggest what to focus on next.",
+    "start": "Start Level Check",
+    "skip": "Skip for now",
+    "generating": "Building a fresh set of questions for you…",
+    "generateError": "Couldn't generate the level check. Try again.",
+    "questionProgress": "Question {{current}} of {{total}} · {{level}}",
+    "playSentence": "🔊 Play Sentence",
+    "pressPlay": "Press play, then answer the question below.",
+    "next": "Next →",
+    "continueToWriting": "Continue to Writing →",
+    "writingSampleLabel": "Writing Sample",
+    "continueToSpeaking": "Continue to Speaking →",
+    "wordCount_one": "{{count}} word",
+    "wordCount_other": "{{count}} words",
+    "readAloud": "Read This Aloud",
+    "speechNotSupported": "Speech recognition isn't supported in this browser — try Chrome, or skip this step.",
+    "getResults": "✨ Get My Results",
+    "scoring": "Scoring your level check…",
+    "errorTitle": "Couldn't score your quiz",
+    "yourLevels": "Your Levels",
+    "focusArea": "Focus area",
+    "tipsToImprove": "Tips to Improve {{skill}}",
+    "continueToHome": "Continue to Home →"
+  },
+  "recording": {
+    "practiceText": "📄 Practice Text",
+    "readThisAloud": "(read this aloud)",
+    "notAvailableTitle": "Speech Recognition Not Available",
+    "notAvailableBody": "Your browser doesn't support the Web Speech API. Please use Google Chrome or Microsoft Edge for the best experience.",
+    "recording": "Recording…",
+    "recordingTapStop": "Recording… tap to stop",
+    "tapToStart": "Tap to start recording",
+    "recordingComplete": "Recording complete — {{time}}",
+    "pressMicToBegin": "Press the mic to begin",
+    "liveTranscript": "Live Transcript",
+    "transcriptPlaceholder": "Your speech will appear here…",
+    "wordsOf": "{{spoken}} / {{target}} words",
+    "wordsSpoken": "Words spoken",
+    "tryAgainButton": "🔄 Try Again",
+    "speakClearlyTip": "Speak clearly… press stop when finished",
+    "seeResults": "✅ See My Results"
+  },
+  "speaking": {
+    "tryAgain": "Try again",
+    "tabAccuracy": "📊 Accuracy",
+    "tabFeedback": "✨ AI Feedback",
+    "newSession": "🎙️ Start a New Session"
+  },
+  "history": {
+    "title": "Session History",
+    "clearAll": "Clear all",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "hideCorrections": "▲ Hide corrections",
+    "showCorrections_one": "▼ {{count}} correction",
+    "showCorrections_other": "▼ {{count}} corrections",
+    "noResults": "No sessions found for this filter.",
+    "showFewer": "▲ Show fewer",
+    "showMore": "▼ Show {{count}} more"
+  },
+  "recommendations": {
+    "findLevel": "Find your level",
+    "findLevelBody": "Take a 5-minute check to get a personalized CEFR level and tips per skill.",
+    "startButton": "Start",
+    "focus": "Focus: {{skill}}",
+    "overallLevel": "{{level}} overall",
+    "refreshing": "Refreshing…",
+    "refresh": "🔄 Refresh recommendations",
+    "retakeQuiz": "Retake level quiz",
+    "refreshError": "Could not refresh recommendations."
+  },
+  "feedback": {
+    "getFeedback": "✨ Get AI Feedback",
+    "apiError": "API Error",
+    "title": "AI Feedback",
+    "regenerate": "Regenerate",
+    "recordFirst": "Record yourself speaking first before requesting feedback."
+  }
+}

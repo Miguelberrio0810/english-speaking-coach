@@ -1,0 +1,129 @@
+{
+  "common": {
+    "tryAgain": "Intentar de nuevo",
+    "back": "Atrás",
+    "stop": "Detener",
+    "all": "Todos",
+    "loading": "Cargando…"
+  },
+  "app": {
+    "title": "English Speaking Coach",
+    "description": "Practica inglés hablado con feedback generado por IA. Elige un tema, grábate y recibe un análisis de precisión palabra por palabra."
+  },
+  "skills": {
+    "speaking": { "label": "Hablar", "desc": "Lee un texto en voz alta y recibe feedback de pronunciación" },
+    "listening": { "label": "Escuchar", "desc": "Escucha y escribe lo que oyes — reto de dictado" },
+    "reading": { "label": "Lectura", "desc": "Lee un texto y responde preguntas de comprensión" },
+    "writing": { "label": "Escritura", "desc": "Responde una consigna y recibe feedback de gramática y nivel CEFR" }
+  },
+  "levels": {
+    "A1": { "label": "A1 — Principiante", "desc": "Palabras y frases simples, presente, vocabulario básico" },
+    "A2": { "label": "A2 — Elemental", "desc": "Frases cortas, pasado, temas cotidianos" },
+    "B1": { "label": "B1 — Intermedio", "desc": "Frases conectadas, opiniones, ideas complejas" },
+    "B2": { "label": "B2 — Intermedio alto", "desc": "Temas abstractos, vocabulario sofisticado, debate" },
+    "C1": { "label": "C1 — Avanzado", "desc": "Nivel académico/profesional, lenguaje matizado, argumentación compleja" }
+  },
+  "home": {
+    "tagline": "Cuatro destrezas. Cinco niveles CEFR. Feedback real con IA.",
+    "chooseSkill": "Elige una destreza",
+    "chooseLevel": "Elige tu nivel",
+    "chooseActivity": "Elige una actividad",
+    "generateTopic": "✨ Generar un tema nuevo",
+    "generatingTopic": "Generando un tema nuevo…",
+    "generateTopicError": "No se pudo generar un tema nuevo. Intenta de nuevo.",
+    "startActivity": "{{icon}} Empezar {{skill}} — {{title}}"
+  },
+  "streak": {
+    "days_one": "{{count}} día de racha",
+    "days_other": "{{count}} días de racha",
+    "noStreak": "Practica hoy para empezar una racha"
+  },
+  "progress": {
+    "title": "Tu progreso",
+    "summary": "Tu precisión pasó de {{from}}% a {{to}}% en tus últimas {{count}} sesiones.",
+    "notEnoughData": "Completa algunas sesiones más de habla o escucha para ver tu progreso."
+  },
+  "placement": {
+    "title": "Evaluación de nivel",
+    "subtitle": "Una evaluación rápida de 5 minutos en las cuatro destrezas para personalizar tu práctica.",
+    "introBody": "Vas a responder 15 preguntas rápidas de opción múltiple, escribir algunas frases y leer un texto corto en voz alta. Estimaremos tu nivel CEFR por destreza y te sugeriremos en qué enfocarte.",
+    "start": "Empezar evaluación",
+    "skip": "Omitir por ahora",
+    "generating": "Preparando un set de preguntas nuevo para ti…",
+    "generateError": "No se pudo generar la evaluación de nivel. Intenta de nuevo.",
+    "questionProgress": "Pregunta {{current}} de {{total}} · {{level}}",
+    "playSentence": "🔊 Reproducir frase",
+    "pressPlay": "Presiona reproducir y luego responde la pregunta.",
+    "next": "Siguiente →",
+    "continueToWriting": "Continuar a Escritura →",
+    "writingSampleLabel": "Muestra de escritura",
+    "continueToSpeaking": "Continuar a Habla →",
+    "wordCount_one": "{{count}} palabra",
+    "wordCount_other": "{{count}} palabras",
+    "readAloud": "Lee esto en voz alta",
+    "speechNotSupported": "El reconocimiento de voz no es compatible con este navegador — prueba Chrome, u omite este paso.",
+    "getResults": "✨ Ver mis resultados",
+    "scoring": "Calificando tu evaluación de nivel…",
+    "errorTitle": "No se pudo calificar tu evaluación",
+    "yourLevels": "Tus niveles",
+    "focusArea": "Área de enfoque",
+    "tipsToImprove": "Consejos para mejorar {{skill}}",
+    "continueToHome": "Continuar al inicio →"
+  },
+  "recording": {
+    "practiceText": "📄 Texto de práctica",
+    "readThisAloud": "(léelo en voz alta)",
+    "notAvailableTitle": "Reconocimiento de voz no disponible",
+    "notAvailableBody": "Tu navegador no es compatible con la Web Speech API. Usa Google Chrome o Microsoft Edge para la mejor experiencia.",
+    "recording": "Grabando…",
+    "recordingTapStop": "Grabando… toca para detener",
+    "tapToStart": "Toca para empezar a grabar",
+    "recordingComplete": "Grabación completa — {{time}}",
+    "pressMicToBegin": "Presiona el micrófono para empezar",
+    "liveTranscript": "Transcripción en vivo",
+    "transcriptPlaceholder": "Tu voz aparecerá aquí…",
+    "wordsOf": "{{spoken}} / {{target}} palabras",
+    "wordsSpoken": "Palabras dichas",
+    "tryAgainButton": "🔄 Intentar de nuevo",
+    "speakClearlyTip": "Habla claro… presiona detener cuando termines",
+    "seeResults": "✅ Ver mis resultados"
+  },
+  "speaking": {
+    "tryAgain": "Intentar de nuevo",
+    "tabAccuracy": "📊 Precisión",
+    "tabFeedback": "✨ Feedback IA",
+    "newSession": "🎙️ Empezar una sesión nueva"
+  },
+  "history": {
+    "title": "Historial de sesiones",
+    "clearAll": "Borrar todo",
+    "justNow": "Justo ahora",
+    "minutesAgo": "hace {{count}}m",
+    "hoursAgo": "hace {{count}}h",
+    "daysAgo": "hace {{count}}d",
+    "hideCorrections": "▲ Ocultar correcciones",
+    "showCorrections_one": "▼ {{count}} corrección",
+    "showCorrections_other": "▼ {{count}} correcciones",
+    "noResults": "No hay sesiones para este filtro.",
+    "showFewer": "▲ Mostrar menos",
+    "showMore": "▼ Mostrar {{count}} más"
+  },
+  "recommendations": {
+    "findLevel": "Encuentra tu nivel",
+    "findLevelBody": "Haz una evaluación de 5 minutos para obtener tu nivel CEFR personalizado y consejos por destreza.",
+    "startButton": "Empezar",
+    "focus": "Enfoque: {{skill}}",
+    "overallLevel": "{{level}} general",
+    "refreshing": "Actualizando…",
+    "refresh": "🔄 Actualizar recomendaciones",
+    "retakeQuiz": "Repetir evaluación de nivel",
+    "refreshError": "No se pudieron actualizar las recomendaciones."
+  },
+  "feedback": {
+    "getFeedback": "✨ Obtener feedback de IA",
+    "apiError": "Error de la API",
+    "title": "Feedback de IA",
+    "regenerate": "Regenerar",
+    "recordFirst": "Grábate hablando antes de pedir feedback."
+  }
+}

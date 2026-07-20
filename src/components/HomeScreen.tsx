@@ -1,9 +1,22 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { type Skill, type CEFRLevel, type Activity, getActivities, CEFR_LEVELS } from '../data/activities';
 import { type UserProfile } from '../lib/profile';
 import { type SessionEntry } from './SessionHistory';
 import { RecommendationsPanel } from './RecommendationsPanel';
+import { ProgressPanel } from './ProgressPanel';
+import { loadRecentTopics, addRecentTopics } from '../lib/topicHistory';
 import AnimatedCardStack from '@/components/ui/animate-card-animation';
+
+interface GeneratedActivityResponse {
+  icon:        string;
+  theme:       string;
+  title:       string;
+  text:        string;
+  questions?:   string[];
+  wordTarget?:  { min: number; max: number };
+  topic:       string;
+}
 
 interface Props {
   onStart:         (activity: Activity) => void;
@@ -16,8 +29,6 @@ interface Props {
 interface SkillMeta {
   skill:   Skill;
   icon:    string;
-  label:   string;
-  desc:    string;
   color:   string;
   bg:      string;
   border:  string;
@@ -25,46 +36,10 @@ interface SkillMeta {
 }
 
 const SKILLS: SkillMeta[] = [
-  {
-    skill:  'speaking',
-    icon:   '🎙️',
-    label:  'Speaking',
-    desc:   'Read text aloud and get pronunciation feedback',
-    color:  'text-violet-400',
-    bg:     'bg-violet-500/10',
-    border: 'border-violet-500/30',
-    ring:   'ring-violet-500/40',
-  },
-  {
-    skill:  'listening',
-    icon:   '🎧',
-    label:  'Listening',
-    desc:   'Listen and type what you hear — dictation challenge',
-    color:  'text-amber-400',
-    bg:     'bg-amber-500/10',
-    border: 'border-amber-500/30',
-    ring:   'ring-amber-500/40',
-  },
-  {
-    skill:  'reading',
-    icon:   '📖',
-    label:  'Reading',
-    desc:   'Read a passage and answer comprehension questions',
-    color:  'text-sky-400',
-    bg:     'bg-sky-500/10',
-    border: 'border-sky-500/30',
-    ring:   'ring-sky-500/40',
-  },
-  {
-    skill:  'writing',
-    icon:   '✍️',
-    label:  'Writing',
-    desc:   'Respond to a prompt and get grammar & CEFR feedback',
-    color:  'text-emerald-400',
-    bg:     'bg-emerald-500/10',
-    border: 'border-emerald-500/30',
-    ring:   'ring-emerald-500/40',
-  },
+  { skill: 'speaking',  icon: '🎙️', color: 'text-violet-400',  bg: 'bg-violet-500/10',  border: 'border-violet-500/30',  ring: 'ring-violet-500/40'  },
+  { skill: 'listening', icon: '🎧', color: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/30',   ring: 'ring-amber-500/40'   },
+  { skill: 'reading',   icon: '📖', color: 'text-sky-400',     bg: 'bg-sky-500/10',     border: 'border-sky-500/30',     ring: 'ring-sky-500/40'     },
+  { skill: 'writing',   icon: '✍️', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', ring: 'ring-emerald-500/40' },
 ];
 
 const CEFR_BADGE: Record<CEFRLevel, string> = {
@@ -76,14 +51,63 @@ const CEFR_BADGE: Record<CEFRLevel, string> = {
 };
 
 export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetakeQuiz }: Props) {
+  const { t } = useTranslation();
   const [selectedSkill,    setSelectedSkill]    = useState<Skill | null>(null);
   const [selectedLevel,    setSelectedLevel]    = useState<CEFRLevel | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [generatedActivities, setGeneratedActivities] = useState<Activity[]>([]);
+  const [generating,       setGenerating]       = useState(false);
+  const [generateError,    setGenerateError]    = useState(false);
 
   const skillMeta = selectedSkill ? SKILLS.find(s => s.skill === selectedSkill) : null;
-  const activities = selectedSkill && selectedLevel
+  const staticActivities = selectedSkill && selectedLevel
     ? getActivities(selectedSkill, selectedLevel)
     : [];
+  const activities = selectedSkill && selectedLevel
+    ? [
+        ...generatedActivities.filter(a => a.skill === selectedSkill && a.level === selectedLevel),
+        ...staticActivities,
+      ]
+    : [];
+
+  async function handleGenerateTopic() {
+    if (!selectedSkill || !selectedLevel) return;
+    setGenerating(true);
+    setGenerateError(false);
+    try {
+      const res = await fetch('/api/generate-activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          skill: selectedSkill,
+          level: selectedLevel,
+          recentTopics: loadRecentTopics(),
+        }),
+      });
+      if (!res.ok) throw new Error('generation failed');
+      const data = await res.json() as GeneratedActivityResponse;
+
+      const activity: Activity = {
+        id: `gen-${crypto.randomUUID()}`,
+        skill: selectedSkill,
+        level: selectedLevel,
+        icon: data.icon,
+        theme: data.theme,
+        title: data.title,
+        text: data.text,
+        questions: data.questions,
+        wordTarget: data.wordTarget,
+      };
+
+      setGeneratedActivities(prev => [activity, ...prev]);
+      addRecentTopics([data.topic]);
+      setSelectedActivity(activity);
+    } catch {
+      setGenerateError(true);
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   function handleSkillClick(skill: Skill) {
     setSelectedSkill(skill);
@@ -117,7 +141,7 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
           English Coach
         </h1>
         <p className="text-slate-400 text-sm max-w-xs mx-auto leading-relaxed">
-          Four skills. Five CEFR levels. Real AI feedback.
+          {t('home.tagline')}
         </p>
       </div>
 
@@ -131,10 +155,12 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
         onRetakeQuiz={onRetakeQuiz}
       />
 
+      <ProgressPanel sessions={history} />
+
       {/* ── Skill cards ── */}
       <div>
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
-          Choose a Skill
+          {t('home.chooseSkill')}
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {SKILLS.map(s => {
@@ -152,9 +178,9 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
               >
                 <div className="text-2xl mb-2">{s.icon}</div>
                 <div className={`font-semibold text-sm mb-1 ${active ? s.color : 'text-slate-200'}`}>
-                  {s.label}
+                  {t(`skills.${s.skill}.label`)}
                 </div>
-                <div className="text-xs text-slate-500 leading-snug">{s.desc}</div>
+                <div className="text-xs text-slate-500 leading-snug">{t(`skills.${s.skill}.desc`)}</div>
               </button>
             );
           })}
@@ -165,7 +191,7 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
       {selectedSkill && (
         <div className="fade-in">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
-            Choose Your Level
+            {t('home.chooseLevel')}
           </h2>
           <div className="flex flex-wrap gap-2">
             {CEFR_LEVELS.map(lvl => {
@@ -174,7 +200,7 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
                 <button
                   key={lvl.value}
                   onClick={() => handleLevelClick(lvl.value)}
-                  title={lvl.desc}
+                  title={t(`levels.${lvl.value}.desc`)}
                   className={`
                     px-3.5 py-1.5 rounded-full border text-xs font-semibold transition-all duration-200
                     ${active
@@ -189,18 +215,40 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
           </div>
           {selectedLevel && (
             <p className="text-xs text-slate-500 mt-2">
-              {CEFR_LEVELS.find(l => l.value === selectedLevel)?.desc}
+              {t(`levels.${selectedLevel}.desc`)}
             </p>
           )}
         </div>
       )}
 
       {/* ── Activity grid ── */}
-      {activities.length > 0 && skillMeta && (
+      {selectedSkill && selectedLevel && skillMeta && (
         <div className="fade-in">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">
-            Choose an Activity
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+              {t('home.chooseActivity')}
+            </h2>
+            <button
+              onClick={handleGenerateTopic}
+              disabled={generating}
+              className="text-xs text-violet-400 hover:text-violet-300 disabled:opacity-50 disabled:cursor-wait transition-colors"
+            >
+              {generating ? t('home.generatingTopic') : t('home.generateTopic')}
+            </button>
+          </div>
+
+          {generateError && (
+            <p className="text-xs text-rose-400 mb-3">{t('home.generateTopicError')}</p>
+          )}
+
+          {generating && (
+            <div className="rounded-2xl border border-white/10 bg-surface p-4 mb-3 flex flex-col gap-2">
+              <div className="h-4 w-2/3 rounded-full bg-surface-2 animate-pulse" />
+              <div className="h-3 w-full rounded-full bg-surface-2 animate-pulse" />
+              <div className="h-3 w-5/6 rounded-full bg-surface-2 animate-pulse" />
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {activities.map(act => {
               const active = selectedActivity?.id === act.id;
@@ -248,7 +296,11 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
               ${selectedSkill === 'writing'   ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/40': ''}
             `}
           >
-            {skillMeta.icon} Start {skillMeta.label} — {selectedActivity.title}
+            {t('home.startActivity', {
+              icon: skillMeta.icon,
+              skill: t(`skills.${skillMeta.skill}.label`),
+              title: selectedActivity.title,
+            })}
           </button>
         </div>
       )}

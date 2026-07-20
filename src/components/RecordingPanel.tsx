@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   isRecording:       boolean;
@@ -29,6 +30,7 @@ export function RecordingPanel({
   onStop,
   onReset,
 }: Props) {
+  const { t } = useTranslation();
   const [textExpanded, setTextExpanded] = useState(true);
 
   const hasSpoken   = transcript.length > 0;
@@ -39,11 +41,9 @@ export function RecordingPanel({
     return (
       <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 text-center">
         <div className="text-3xl mb-3">⚠️</div>
-        <h3 className="text-amber-300 font-semibold mb-2">Speech Recognition Not Available</h3>
+        <h3 className="text-amber-300 font-semibold mb-2">{t('recording.notAvailableTitle')}</h3>
         <p className="text-slate-400 text-sm leading-relaxed">
-          Your browser doesn't support the Web Speech API.
-          Please use <strong className="text-white">Google Chrome</strong> or{' '}
-          <strong className="text-white">Microsoft Edge</strong> for the best experience.
+          {t('recording.notAvailableBody')}
         </p>
       </div>
     );
@@ -61,9 +61,9 @@ export function RecordingPanel({
         >
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-              📄 Practice Text
+              {t('recording.practiceText')}
             </span>
-            <span className="text-xs text-slate-600">(read this aloud)</span>
+            <span className="text-xs text-slate-600">{t('recording.readThisAloud')}</span>
           </div>
           <svg
             className={`w-4 h-4 text-slate-500 transition-transform duration-200
@@ -128,7 +128,7 @@ export function RecordingPanel({
             <>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                <span className="text-rose-400 text-sm font-medium">Recording…</span>
+                <span className="text-rose-400 text-sm font-medium">{t('recording.recording')}</span>
               </div>
               <span className="text-2xl font-mono font-bold text-white tabular-nums">
                 {formatTime(elapsedSeconds)}
@@ -137,10 +137,10 @@ export function RecordingPanel({
           ) : hasSpoken ? (
             <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
               <span>✓</span>
-              <span>Recording complete — {formatTime(elapsedSeconds)}</span>
+              <span>{t('recording.recordingComplete', { time: formatTime(elapsedSeconds) })}</span>
             </div>
           ) : (
-            <span className="text-slate-500 text-sm">Press the mic to begin</span>
+            <span className="text-slate-500 text-sm">{t('recording.pressMicToBegin')}</span>
           )}
         </div>
       </div>
@@ -149,17 +149,17 @@ export function RecordingPanel({
       <div className="bg-surface rounded-xl border border-white/10 p-4 min-h-[120px]">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-            Live Transcript
+            {t('recording.liveTranscript')}
           </span>
           {hasSpoken && (
             <span className="text-xs text-slate-500">
-              {wordCount} / {targetWords} words
+              {t('recording.wordsOf', { spoken: wordCount, target: targetWords })}
             </span>
           )}
         </div>
 
         {!hasSpoken && !interimTranscript ? (
-          <p className="text-slate-600 text-sm italic">Your speech will appear here…</p>
+          <p className="text-slate-600 text-sm italic">{t('recording.transcriptPlaceholder')}</p>
         ) : (
           <p className="text-slate-200 text-sm leading-relaxed">
             {transcript}
@@ -174,7 +174,7 @@ export function RecordingPanel({
       {hasSpoken && (
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-slate-500">Words spoken</span>
+            <span className="text-xs text-slate-500">{t('recording.wordsSpoken')}</span>
             <span className="text-xs text-slate-400">
               {Math.min(100, Math.round((wordCount / targetWords) * 100))}%
             </span>
@@ -196,7 +196,7 @@ export function RecordingPanel({
             className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-400 text-sm
                        hover:border-white/20 hover:text-white hover:bg-surface-2 transition-all"
           >
-            🔄 Try Again
+            {t('recording.tryAgainButton')}
           </button>
         </div>
       )}
@@ -204,7 +204,7 @@ export function RecordingPanel({
       {/* Tip when recording is active */}
       {isRecording && (
         <div className="text-center text-xs text-slate-600 animate-pulse">
-          Speak clearly… press stop when finished
+          {t('recording.speakClearlyTip')}
         </div>
       )}
     </div>

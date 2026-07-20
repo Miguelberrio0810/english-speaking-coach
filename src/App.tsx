@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { type Activity } from './data/activities';
+import { LanguageToggle }   from './components/LanguageToggle';
 import { HomeScreen }       from './components/HomeScreen';
 import { PracticeText }     from './components/PracticeText';
 import { RecordingPanel }   from './components/RecordingPanel';
@@ -38,6 +40,7 @@ type ResultTab    = 'Accuracy' | 'AI Feedback';
 type View = 'home' | 'placement' | 'speaking' | 'listening' | 'reading' | 'writing';
 
 export default function App() {
+  const { t } = useTranslation();
   const [view,     setView]     = useState<View>(() => (loadProfile() ? 'home' : 'placement'));
   const [activity, setActivity] = useState<Activity | null>(null);
   const [history,  setHistory]  = useState<SessionEntry[]>(loadHistory);
@@ -147,6 +150,10 @@ export default function App() {
     <div className="min-h-screen bg-background text-slate-100">
       <div className="max-w-2xl mx-auto px-4 py-8">
 
+        <div className="flex justify-end mb-4">
+          <LanguageToggle />
+        </div>
+
         {/* ── PLACEMENT QUIZ ── */}
         {view === 'placement' && (
           <PlacementQuiz onComplete={handleQuizComplete} onSkip={handleQuizSkip} />
@@ -224,7 +231,7 @@ export default function App() {
                                font-semibold transition-all duration-200 shadow-lg shadow-emerald-900/40
                                hover:-translate-y-0.5 active:translate-y-0 fade-in"
                   >
-                    ✅ See My Results
+                    {t('recording.seeResults')}
                   </button>
                 )}
               </div>
@@ -252,22 +259,22 @@ export default function App() {
                     onClick={handleSpeakingTryAgain}
                     className="text-xs text-violet-400 hover:text-violet-300 underline underline-offset-2 whitespace-nowrap"
                   >
-                    Try again
+                    {t('speaking.tryAgain')}
                   </button>
                 </div>
 
                 {/* Tab bar */}
                 <div className="flex bg-surface rounded-xl p-1 gap-1">
-                  {(['Accuracy', 'AI Feedback'] as ResultTab[]).map(t => (
+                  {(['Accuracy', 'AI Feedback'] as ResultTab[]).map(tab => (
                     <button
-                      key={t}
-                      onClick={() => setResultTab(t)}
+                      key={tab}
+                      onClick={() => setResultTab(tab)}
                       className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                        ${resultTab === t
+                        ${resultTab === tab
                           ? 'bg-violet-600 text-white shadow-sm'
                           : 'text-slate-400 hover:text-slate-200'}`}
                     >
-                      {t === 'Accuracy' ? '📊 Accuracy' : '✨ AI Feedback'}
+                      {tab === 'Accuracy' ? t('speaking.tabAccuracy') : t('speaking.tabFeedback')}
                     </button>
                   ))}
                 </div>
@@ -296,7 +303,7 @@ export default function App() {
                              hover:border-violet-500/40 hover:text-violet-400 hover:bg-violet-500/5
                              transition-all duration-200"
                 >
-                  🎙️ Start a New Session
+                  {t('speaking.newSession')}
                 </button>
               </div>
             )}

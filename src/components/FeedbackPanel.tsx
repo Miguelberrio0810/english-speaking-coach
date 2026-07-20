@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useClaudeAPI } from '../hooks/useClaudeAPI';
@@ -49,6 +50,7 @@ export function FeedbackPanel({
   spokenText,
   accuracy,
 }: Props) {
+  const { t } = useTranslation();
   const [hasAsked, setHasAsked] = useState(false);
 
   const { streamingText, isStreaming, error, getFeedback, cancel, reset } = useClaudeAPI();
@@ -84,7 +86,7 @@ export function FeedbackPanel({
               : 'bg-surface-2 text-slate-600 cursor-not-allowed'}
           `}
         >
-          ✨ Get AI Feedback
+          {t('feedback.getFeedback')}
         </button>
       )}
 
@@ -94,7 +96,7 @@ export function FeedbackPanel({
           <div className="flex items-start gap-3">
             <span className="text-rose-400 mt-0.5">⚠️</span>
             <div>
-              <div className="text-rose-300 font-semibold text-sm mb-1">API Error</div>
+              <div className="text-rose-300 font-semibold text-sm mb-1">{t('feedback.apiError')}</div>
               <div className="text-slate-400 text-sm">{error}</div>
             </div>
           </div>
@@ -102,7 +104,7 @@ export function FeedbackPanel({
             onClick={handleGetFeedback}
             className={`mt-3 text-xs ${colors.accent} hover:opacity-80 underline underline-offset-2`}
           >
-            Try again
+            {t('common.tryAgain')}
           </button>
         </div>
       )}
@@ -113,7 +115,7 @@ export function FeedbackPanel({
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className={colors.accent}>🤖</span>
-              <h3 className="text-sm font-semibold text-slate-200">AI Feedback</h3>
+              <h3 className="text-sm font-semibold text-slate-200">{t('feedback.title')}</h3>
               {isStreaming && (
                 <span className="flex gap-0.5 ml-2">
                   {[0, 1, 2].map(i => (
@@ -128,11 +130,11 @@ export function FeedbackPanel({
             </div>
             {isStreaming ? (
               <button onClick={cancel} className="text-xs text-slate-500 hover:text-rose-400 transition-colors">
-                Stop
+                {t('common.stop')}
               </button>
             ) : (
               <button onClick={handleGetFeedback} className={`text-xs text-slate-500 hover:${colors.accent} transition-colors`}>
-                Regenerate
+                {t('feedback.regenerate')}
               </button>
             )}
           </div>
@@ -151,7 +153,7 @@ export function FeedbackPanel({
       {/* No speech warning */}
       {hasAsked && !spokenText.trim() && (
         <div className="text-center text-sm text-slate-500 py-2">
-          Record yourself speaking first before requesting feedback.
+          {t('feedback.recordFirst')}
         </div>
       )}
     </div>
