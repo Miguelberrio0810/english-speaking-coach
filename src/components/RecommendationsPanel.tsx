@@ -58,12 +58,11 @@ export function RecommendationsPanel({ profile, history, onProfileUpdate, onReta
         }),
       });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error?.message || `Request failed (${res.status})`);
+      const data = await res.json().catch(() => ({})) as Omit<UserProfile, 'quizTakenAt'> & { error?: { message?: string } };
+      if (!res.ok || data.error) {
+        throw new Error(data.error?.message || `Request failed (${res.status})`);
       }
 
-      const data = await res.json() as Omit<UserProfile, 'quizTakenAt'>;
       onProfileUpdate({ ...data, quizTakenAt: profile.quizTakenAt });
     } catch (e) {
       setError(e instanceof Error ? e.message : t('recommendations.refreshError'));

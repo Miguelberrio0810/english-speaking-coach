@@ -1,5 +1,7 @@
 export const config = { runtime: 'edge' };
 
+import { streamingJsonResponse } from '../src/lib/edgeStream';
+
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-6';
 
@@ -161,47 +163,42 @@ export default async function handler(req: Request): Promise<Response> {
     recentTopics.length ? recentTopics.map(t => `- ${t}`).join('\n') : '(none yet — this is the student\'s first attempt)',
   );
 
-  // Nudge sampling variety across back-to-back requests with the same prompt.
-  const userNudge = `Generate a new quiz now. Random seed: ${crypto.randomUUID()}.`;
+  return streamingJsonResponse(async () => {
+    // Nudge sampling variety across back-to-back requests with the same prompt.
+    const userNudge = `Generate a new quiz now. Random seed: ${crypto.randomUUID()}.`;
 
-  const anthropicRes = await fetch(ANTHROPIC_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type':      'application/json',
-      'x-api-key':         apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model:       MODEL,
-      max_tokens:  4000,
-      stream:      false,
-      temperature: 1,
-      system:      systemPrompt,
-      messages:    [{ role: 'user', content: userNudge }],
-    }),
-  });
-
-  if (!anthropicRes.ok) {
-    const errBody = await anthropicRes.json().catch(() => ({}));
-    return new Response(JSON.stringify(errBody), {
-      status: anthropicRes.status,
-      headers: { 'content-type': 'application/json' },
+    const anthropicRes = await fetch(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type':      'application/json',
+        'x-api-key':         apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model:         MODEL,
+        max_tokens:    4000,
+        stream:        false,
+        temperature:   1,
+        thinking:      { type: 'disabled' },
+        output_config: { effort: 'medium' },
+        system:        systemPrompt,
+        messages:      [{ role: 'user', content: userNudge }],
+      }),
     });
-  }
 
-  const data = await anthropicRes.json() as { content?: { type: string; text?: string }[] };
-  const text = data.content?.find(b => b.type === 'text')?.text ?? '';
-  const quiz = parseQuiz(text);
+    if (!anthropicRes.ok) {
+      const errBody = await anthropicRes.json().catch(() => ({})) as { error?: { message?: string } };
+      return { error: { message: errBody.error?.message || `Anthropic API error (${anthropicRes.status})` } };
+    }
 
-  if (!quiz) {
-    return new Response(
-      JSON.stringify({ error: { message: 'Could not generate a valid quiz from the model.' } }),
-      { status: 502, headers: { 'content-type': 'application/json' } },
-    );
-  }
+    const data = await anthropicRes.json() as { content?: { type: string; text?: string }[] };
+    const text = data.content?.find(b => b.type === 'text')?.text ?? '';
+    const quiz = parseQuiz(text);
 
-  return new Response(JSON.stringify(quiz), {
-    status: 200,
-    headers: { 'content-type': 'application/json' },
+    if (!quiz) {
+      return { error: { message: 'Could not generate a valid quiz from the model.' } };
+    }
+
+    return quiz;
   });
 }

@@ -84,8 +84,8 @@ export function HomeScreen({ onStart, profile, history, onProfileUpdate, onRetak
           recentTopics: loadRecentTopics(),
         }),
       });
-      if (!res.ok) throw new Error('generation failed');
-      const data = await res.json() as GeneratedActivityResponse;
+      const data = await res.json().catch(() => ({})) as GeneratedActivityResponse & { error?: { message?: string } };
+      if (!res.ok || data.error) throw new Error(data.error?.message || 'generation failed');
 
       const activity: Activity = {
         id: `gen-${crypto.randomUUID()}`,

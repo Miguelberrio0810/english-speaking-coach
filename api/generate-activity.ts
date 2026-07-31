@@ -2,6 +2,8 @@ import type { Skill, CEFRLevel } from '../src/data/activities';
 
 export const config = { runtime: 'edge' };
 
+import { streamingJsonResponse } from '../src/lib/edgeStream';
+
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-6';
 
@@ -126,44 +128,39 @@ Respond with ONLY a single JSON object, no prose before or after:
 }
 Only include "questions" for reading activities and "wordTarget" for writing activities — omit both fields entirely for speaking/listening.`;
 
-  const anthropicRes = await fetch(ANTHROPIC_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type':      'application/json',
-      'x-api-key':         apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model:       MODEL,
-      max_tokens:  1200,
-      stream:      false,
-      temperature: 1,
-      system:      systemPrompt,
-      messages:    [{ role: 'user', content: `Generate a new ${body.skill} activity now. Random seed: ${crypto.randomUUID()}.` }],
-    }),
-  });
-
-  if (!anthropicRes.ok) {
-    const errBody = await anthropicRes.json().catch(() => ({}));
-    return new Response(JSON.stringify(errBody), {
-      status: anthropicRes.status,
-      headers: { 'content-type': 'application/json' },
+  return streamingJsonResponse(async () => {
+    const anthropicRes = await fetch(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type':      'application/json',
+        'x-api-key':         apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model:         MODEL,
+        max_tokens:    1200,
+        stream:        false,
+        temperature:   1,
+        thinking:      { type: 'disabled' },
+        output_config: { effort: 'medium' },
+        system:        systemPrompt,
+        messages:      [{ role: 'user', content: `Generate a new ${body.skill} activity now. Random seed: ${crypto.randomUUID()}.` }],
+      }),
     });
-  }
 
-  const data = await anthropicRes.json() as { content?: { type: string; text?: string }[] };
-  const text = data.content?.find(b => b.type === 'text')?.text ?? '';
-  const activity = parseActivity(text);
+    if (!anthropicRes.ok) {
+      const errBody = await anthropicRes.json().catch(() => ({})) as { error?: { message?: string } };
+      return { error: { message: errBody.error?.message || `Anthropic API error (${anthropicRes.status})` } };
+    }
 
-  if (!activity) {
-    return new Response(
-      JSON.stringify({ error: { message: 'Could not generate a valid activity from the model.' } }),
-      { status: 502, headers: { 'content-type': 'application/json' } },
-    );
-  }
+    const data = await anthropicRes.json() as { content?: { type: string; text?: string }[] };
+    const text = data.content?.find(b => b.type === 'text')?.text ?? '';
+    const activity = parseActivity(text);
 
-  return new Response(JSON.stringify(activity), {
-    status: 200,
-    headers: { 'content-type': 'application/json' },
+    if (!activity) {
+      return { error: { message: 'Could not generate a valid activity from the model.' } };
+    }
+
+    return activity;
   });
 }

@@ -2,6 +2,8 @@ import type { Skill, CEFRLevel } from '../src/data/activities';
 
 export const config = { runtime: 'edge' };
 
+import { streamingJsonResponse } from '../src/lib/edgeStream';
+
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-6';
 const CEFR_VALUES: CEFRLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
@@ -144,43 +146,38 @@ export default async function handler(req: Request): Promise<Response> {
 
   const userPrompt = body.mode === 'quiz' ? buildQuizPrompt(body) : buildRefreshPrompt(body);
 
-  const anthropicRes = await fetch(ANTHROPIC_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type':      'application/json',
-      'x-api-key':         apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model:      MODEL,
-      max_tokens: 800,
-      stream:     false,
-      system:     SYSTEM_PROMPT,
-      messages:   [{ role: 'user', content: userPrompt }],
-    }),
-  });
-
-  if (!anthropicRes.ok) {
-    const errBody = await anthropicRes.json().catch(() => ({}));
-    return new Response(JSON.stringify(errBody), {
-      status: anthropicRes.status,
-      headers: { 'content-type': 'application/json' },
+  return streamingJsonResponse(async () => {
+    const anthropicRes = await fetch(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type':      'application/json',
+        'x-api-key':         apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model:         MODEL,
+        max_tokens:    800,
+        stream:        false,
+        thinking:      { type: 'disabled' },
+        output_config: { effort: 'medium' },
+        system:        SYSTEM_PROMPT,
+        messages:      [{ role: 'user', content: userPrompt }],
+      }),
     });
-  }
 
-  const data = await anthropicRes.json() as { content?: { type: string; text?: string }[] };
-  const text = data.content?.find(b => b.type === 'text')?.text ?? '';
-  const result = parseResult(text);
+    if (!anthropicRes.ok) {
+      const errBody = await anthropicRes.json().catch(() => ({})) as { error?: { message?: string } };
+      return { error: { message: errBody.error?.message || `Anthropic API error (${anthropicRes.status})` } };
+    }
 
-  if (!result) {
-    return new Response(
-      JSON.stringify({ error: { message: 'Could not parse a valid placement result from the model.' } }),
-      { status: 502, headers: { 'content-type': 'application/json' } },
-    );
-  }
+    const data = await anthropicRes.json() as { content?: { type: string; text?: string }[] };
+    const text = data.content?.find(b => b.type === 'text')?.text ?? '';
+    const result = parseResult(text);
 
-  return new Response(JSON.stringify(result), {
-    status: 200,
-    headers: { 'content-type': 'application/json' },
+    if (!result) {
+      return { error: { message: 'Could not parse a valid placement result from the model.' } };
+    }
+
+    return result;
   });
 }

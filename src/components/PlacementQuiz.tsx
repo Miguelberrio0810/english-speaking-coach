@@ -40,11 +40,11 @@ async function fetchGeneratedQuiz(): Promise<GeneratedQuiz> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ recentTopics: loadRecentTopics() }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message || `Request failed (${res.status})`);
+  const data = await res.json().catch(() => ({})) as GeneratedQuiz & { error?: { message?: string } };
+  if (!res.ok || data.error) {
+    throw new Error(data.error?.message || `Request failed (${res.status})`);
   }
-  return res.json() as Promise<GeneratedQuiz>;
+  return data;
 }
 
 export function PlacementQuiz({ onComplete, onSkip }: Props) {
@@ -146,12 +146,11 @@ export function PlacementQuiz({ onComplete, onSkip }: Props) {
         }),
       });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error?.message || `Request failed (${res.status})`);
+      const data = await res.json().catch(() => ({})) as Omit<UserProfile, 'quizTakenAt'> & { error?: { message?: string } };
+      if (!res.ok || data.error) {
+        throw new Error(data.error?.message || `Request failed (${res.status})`);
       }
 
-      const data = await res.json() as Omit<UserProfile, 'quizTakenAt'>;
       setResult(data);
       setStep('results');
     } catch (e) {
